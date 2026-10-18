@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的美工作品集 | Portfolio</title>
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* ==================== 基础设置 ==================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root{
+  --bg:      #faf8f5;   /* 页面背景色 */
+  --text:    #1c1c1c;   /* 主文字色   */
+  --muted:   #7d766e;   /* 次要文字色 */
+  --line:    #e7e1d8;   /* 分割线颜色 */
+  --accent:  #c8553d;   /* 主题强调色 */
+  --card:    #ffffff;   /* 卡片底色   */
+}
+
+html{ scroll-behavior: smooth; }
+
+body{
+  font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img{ display:block; max-width:100%; }
+a{ color: inherit; }
+
+/* 统一内容宽度容器 */
+.wrap{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 6vw;
+  padding-right: 6vw;
+}
+
+section[id]{ scroll-margin-top: 80px; }
+
+/* ==================== 顶部导航 ==================== */
+.nav{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(250,248,245,.82);
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.logo{
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+.nav-inner nav a{
+  margin-left: 26px;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .25s;
+}
+.nav-inner nav a:hover{ color: var(--accent); }
+
+/* ==================== 首屏介绍 ==================== */
+.hero{
+  padding-top: 96px;
+  padding-bottom: 56px;
+}
+.eyebrow{
+  font-size: 12px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+.hero h1{
+  font-size: clamp(32px, 5.6vw, 62px);
+  line-height: 1.16;
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+.hero h1 span{
+  color: var(--accent);
+  background: linear-gradient(transparent 62%, rgba(200,85,61,.20) 62%);
+}
+.lead{
+  margin-top: 24px;
+  max-width: 1520px;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* ==================== 分类筛选按钮 ==================== */
+.filters{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 34px;
+}
+.filter-btn{
+  padding: 8px 20px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .25s ease;
+}
+.filter-btn:hover{ color: var(--text); border-color: var(--text); }
+.filter-btn.active{
+  background: var(--text);
+  border-color: var(--text);
+  color: #fff;
+}
+
+/* ==================== 作品网格 ==================== */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding-bottom: 96px;
+  align-items: stretch; /* 让同一行的卡片高度自动对齐 */
+}
+
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: opacity .7s ease,
+              transform .7s cubic-bezier(.2,.8,.2,1),
+              box-shadow .35s ease;
+  display: flex;        /* 新增：弹性布局 */
+  flex-direction: column; /* 新增：纵向排列 */
+  height: 100%;         /* 新增：撑满网格高度 */
+}
+
+.card img {
+  width: 100%;
+  flex: 1;             /* 新增：占据卡片剩下的所有空间 */
+  min-height: 200px;   /* 新增：防止文字过多时图片被压得太小 */
+  object-fit: cover;   /* 裁剪填满，不留白边 */
+  transition: transform .7s cubic-bezier(.2,.8,.2,1);
+}
+	
+	/* ====== 新增：长截图专属样式 ====== */
+.card.long-pic img {
+  width: 100%;
+  height: auto; /* 高度自动，不裁剪 */
+  display: block;
+  transition: transform .7s cubic-bezier(.2,.8,.2,1);
+}
+	
+	/* ====== 新增：超宽横版海报专属样式 ====== */
+.card.wide-pic {
+  grid-column: span 2; /* 让它横跨两列，变成双倍宽度 */
+}
+
+/* 针对屏幕较窄时（手机端），自动恢复成单列，防止错位 */
+@media (max-width: 720px) {
+  .card.wide-pic {
+    grid-column: span 1;
+  }
+}
+
+/* 图片本身的展示：优先裁剪两边，保留中间核心内容 */
+.card.wide-pic img {
+  aspect-ratio: 16 / 9; /* 横版格子比例 */
+  object-fit: cover;    /* 裁剪填满 */
+  object-position: center; /* 居中显示，保证中间的文字和价格完整 */
+}
+
+		
+	}
+/* ====== 新增：竖版海报专属样式 ====== */
+.card.poster-pic img {
+  aspect-ratio: 3 / 4;         /* 改成竖图比例（宽3高4） */
+  object-fit: contain;         /* 完整显示，不裁剪 */
+  background: #faf8f5;
+}
+	
+.card.fit-pic img {
+  object-fit: contain;
+  background: #f5f5f5;
+}
+	
+.card:hover img{ transform: scale(1.06); }
+
+.card-info{ padding: 16px 18px 20px; flex-shrink: 0; /* 新增：防止文字区域被挤扁 */ }
+.card-info h3{ font-size: 16px; font-weight: 600; }
+.card-info p{
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ==================== 关于 / 联系 ==================== */
+.about{
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 56px;
+  padding-top: 64px;
+  padding-bottom: 90px;
+  border-top: 1px solid var(--line);
+}
+.about h2{
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.about p{
+  font-size: 15px;
+  color: var(--muted);
+}
+.about a{ color: var(--accent); text-decoration: none; }
+.about a:hover{ text-decoration: underline; }
+
+/* ==================== 页脚 ==================== */
+footer{
+  padding: 34px 6vw;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+}
+
+/* ==================== 灯箱（大图查看） ==================== */
+.lightbox{
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vw;
+  background: rgba(22,20,18,.93);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .3s ease, visibility .3s ease;
+}
+.lightbox.open{ opacity: 1; visibility: visible; }
+.lightbox img{
+  max-width: 100%;
+  max-height: 78vh;
+  border-radius: 8px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.5);
+}
+.lightbox-caption{
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+  opacity: .75;
+}
+.close-btn{
+  position: absolute;
+  top: 22px;
+  right: 30px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: .7;
+  transition: opacity .25s, transform .25s;
+}
+.close-btn:hover{ opacity: 1; transform: rotate(90deg); }
+
+/* ==================== 移动端适配 ==================== */
+@media (max-width: 720px){
+  .hero{ padding-top: 60px; padding-bottom: 40px; }
+  .gallery{ gap: 16px; padding-bottom: 64px; }
+  .about{ grid-template-columns: 1fr; gap: 36px; padding-bottom: 64px; }
+  .nav-inner nav a{ margin-left: 16px; font-size: 13px; }
+  .logo{ font-size: 13px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ==================== 顶部导航 ==================== -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="logo">谭云</div>
+    <nav>
+      <a href="#works">作品</a>
+      <a href="#about">关于</a>
+      <a href="#contact">联系</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ==================== 首屏 ==================== -->
+<section class="hero wrap">
+  <p class="eyebrow">Visual Design · 2025.8 — 2026.10</p>
+  <h1>用设计，把想法<br><span>变成看得见的样子</span>。</h1>
+  <p class="lead">这里收录了我近期的设计作品，涵盖品牌装修、校内海报，以及以亚马逊高级A+和产品主副图为主的服装产品海报设计。点击任意作品，即可放大查看细节。以下作品均为本人亲自制作与设计，特此承诺；本人保留有PSD源文件，如有需要，可随时查看。</p>
+</section>
+
+<!-- ==================== 分类筛选 ==================== -->
+<div class="wrap">
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">全部</button>
+    <button class="filter-btn" data-filter="brand">主副图制作</button>
+    <button class="filter-btn" data-filter="poster">产品A+设计</button>
+    <button class="filter-btn" data-filter="ui">校内制作</button>
+    <button class="filter-btn" data-filter="illust">店铺装修</button>
+  </div>
+</div>
+
+<!-- ==================== 作品网格 ====================
+     替换方法：把 <img> 的 src 改成你自己的图片路径，例如 src="images/work1.jpg"
+     并把 data-cat 改成对应分类：brand / poster / ui / illust
+================================================== -->
+<main id="works" class="wrap">
+  <div class="gallery">
+
+    <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_0.1.jpg" alt="品牌视觉识别">
+      <div class="card-info">
+        <h3>产品正面展示</h3>
+        <p>展示裙子姿势 / 2026</p>
+      </div>
+    </article>
+
+    <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_0.2.jpg" alt="音乐节主视觉海报">
+      <div class="card-info">
+        <h3>产品背面展示</h3>
+        <p>更换姿势场景添加 / 2026</p>
+      </div>
+    </article>
+	  
+	      <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_0.3.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换姿势及添加场景/ 2026</p>
+      </div>
+    </article>
+	  
+	  	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_0.4.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品细节展示</h3>
+        <p>设计排版及展示产品细节/ 2026</p>
+      </div>
+    </article>
+	  
+	  	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_0.5.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换姿势及添加场景/ 2026</p>
+      </div>
+    </article>
+	  
+	     <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_0.6.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换姿势及添加场景/ 2026</p>
+      </div>
+    </article>
+
+	      <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_1.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品正面展示</h3>
+        <p>添加背景及更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  	      <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_2.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品背面展示</h3>
+        <p>添加背景及更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  	      <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_4.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品穿搭展示</h3>
+        <p>添加穿搭和背景以及更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  	      <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_3.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  	 <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_5.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_6.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  	   <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_7.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>主图展示</h3>
+        <p>更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	       <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_8.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_9.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品背面展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_10.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品细节展示</h3>
+        <p>设计排版展示产品细节/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_11.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	 
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_12.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_13.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>主图展示</h3>
+        <p>更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_14.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>背面展示</h3>
+        <p>更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_16.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_15.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品细节展示</h3>
+        <p>排版设计及展示细节/ 2026</p>
+      </div>
+    </article>
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_17.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_18.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_19.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品展示</h3>
+        <p>更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_20.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>产品背面展示</h3>
+        <p>更换姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_21.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_22.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>细节展示</h3>
+        <p>排版设计及展示细节/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_23.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+	  <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_24.jpg" alt="移动端应用界面">
+      <div class="card-info">
+        <h3>场景展示</h3>
+        <p>更换背景及姿势/ 2026</p>
+      </div>
+    </article>
+	  
+	  
+    <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_25.jpg" alt="城市插画系列">
+      <div class="card-info">
+        <h3>产品穿搭展示</h3>
+        <p>穿搭 / 2026</p>
+      </div>
+    </article>
+
+    <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_26.jpg" alt="咖啡品牌包装">
+      <div class="card-info">
+        <h3>街道场景</h3>
+        <p>场景添加 / 2026</p>
+      </div>
+    </article>
+
+    <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_27.jpg" alt="公益主题海报">
+      <div class="card-info">
+        <h3>姿势变动及场景变动</h3>
+        <p>姿势及场景添加 / 2026</p>
+      </div>
+    </article>
+	  
+<!-- 在这里粘贴你新加的卡片 -->
+    <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_28.jpg" alt="公益主题海报">
+      <div class="card-info">
+        <h3>裙子展示</h3>
+        <p>姿势变动 / 2026</p>
+      </div>
+    </article>
+	 
+   
+   <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_29.jpg" alt="公益主题海报">
+      <div class="card-info">
+        <h3>正面姿势展示</h3>
+        <p>姿势变动 / 2026</p>
+      </div>
+    </article>
+	  
+	     <article class="card" data-cat="brand">
+      <img src="jpg/主副图/zft_30.jpg" alt="公益主题海报">
+      <div class="card-info">
+        <h3>产品背面展示</h3>
+        <p>姿势变动 / 2026</p>
+      </div>
+    </article>
+    
+	  
+	  	 
+	  <article class="card" data-cat="poster">
+  	<img src="jpg/A+/A+ _2.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>缎面挂脖连衣裙移动端A+</h3>
+    	<p>设计海报图 / 2026</p>
+  	</div>
+	</article>
+	  
+	   <article class="card" data-cat="poster">
+  	<img src="jpg/A+/A+ _4.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>挂脖连衣裙移动端A+</h3>
+    	<p>设计海报图 / 2026</p>
+  	</div>
+	</article>
+	  
+	  
+	   <article class="card" data-cat="poster">
+  	<img src="jpg/A+/A+ _6.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>挂脖连衣裙移动端A+</h3>
+    	<p>设计海报图 / 2026</p>
+  	</div>
+	</article>
+	  
+	   <article class="card" data-cat="poster">
+  	<img src="jpg/A+/A+ _1.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>缎面挂脖连衣裙网页版A+</h3>
+    	<p>设计海报图 / 2026</p>
+  	</div>
+	</article>
+	  
+	  	<article class="card" data-cat="poster">
+  	<img src="jpg/A+/A+ _3.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>挂脖连衣裙网页版A+</h3>
+    	<p>设计海报图 / 2026</p>
+  	</div>
+	</article>
+	  
+	  
+	   <article class="card" data-cat="poster">
+  	<img src="jpg/A+/A+ _5.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>长裙网页版A+</h3>
+    	<p>设计海报图 / 2026</p>
+  	</div>
+	</article>
+	  
+
+	  
+
+	  <!-- 新加的图片卡片，注意 data-cat="brand" 要和按钮对应 -->
+	<!-- 长截图（耳机）卡片 -->
+	<article class="card long-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_1.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>草莓设计海报1</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	<article class="card long-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_2.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>草莓设计海报2</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <article class="card long-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_3.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>流体海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <article class="card long-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_4.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>青团上新海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	   <article class="card long-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_5.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>柠檬海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	    <article class="card long-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_6.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>年货节海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	  
+
+	  
+	  <!-- 横版海报卡片 -->
+	  <article class="card wide-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_13.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>奶瓶设计海报</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <!-- 填补空白的方图（普通尺寸，占据1列） -->
+	 <article class="card long-pic fit-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_7.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>天猫海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	  <article class="card wide-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_14.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>果蔬干设计海报</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	   <article class="card long-pic fit-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_8.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>荞麦面宣传图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	  <article class="card wide-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_15.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>蛋白棒设计海报</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <article class="card long-pic fit-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_9.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>电饭煲海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	  <article class="card wide-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_16.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>指甲剪设计海报</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <article class="card long-pic fit-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_10.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>荞麦粉海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	  <article class="card wide-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_17.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>海苔设计海报</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <article class="card long-pic  fit-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_12.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>菜籽油海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  	  <article class="card wide-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_18.jpg" alt="蛋白棒狂欢海报">
+  	<div class="card-info">
+   	 	<h3>黄豆角干设计海报</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <article class="card long-pic fit-pic" data-cat="ui">
+  	<img src="jpg/校内制作/xn_11.jpg" alt="耳机详情页">
+  	<div class="card-info">
+    	<h3>豆角干海报图</h3>
+    	<p>产品主副图 / 2024</p>
+  	</div>
+	</article>
+	  
+	  <div>
+  <a href="https://www.amazon.com/stores/page/6CD266B4-D16F-45D7-B30B-4A11F841FF50?ingress=2&lp_context_asin=B0CLJB5JVG&visitId=15a0480a-91c5-42fa-bc2f-d43db1b4ad39&store_ref=bl_ast_dp_brandlogo_sto&ref_=ast_bln" target="_blank" class="filter-btn" style="text-decoration: none; display: inline-block;">店铺1</a>
+</div>
+
+	  
+	  <div>
+  <a href="https://www.amazon.com/stores/Mefija/page/F6197A85-8757-4158-868F-5000891C1147?lp_asin=B0HBWWZL75&ref_=ast_bln&store_ref=bl_ast_dp_brandlogo_sto"target="_blank" class="filter-btn" style="text-decoration: none; display: inline-block;">店铺2</a>
+</div>
+  </div>
+</main>
+
+<!-- ==================== 关于 / 联系 ==================== -->
+<section id="about" class="wrap about">
+  <div>
+    <h2>关于我</h2>
+    <p>
+      我是一名视觉设计师，专注于海报设计创作。
+      喜欢在秩序与意外之间寻找平衡，用简洁的形式表达清晰的想法。
+      如果有合作意向，欢迎随时联系我。
+    </p>
+  </div>
+  <div id="contact">
+    <h2>联系方式</h2>
+    <p>
+      
+      微信：tan19509217006<br>
+      联系电话：19509217006</a>
+    </p>
+  </div>
+</section>
+
+<!-- ==================== 页脚 ==================== -->
+<footer>© 2026 Tan Yun · 美工设计作品集</footer>
+
+<!-- ==================== 灯箱结构 ==================== -->
+<div class="lightbox" id="lightbox">
+  <button class="close-btn" id="closeBtn" aria-label="关闭">&times;</button>
+  <img src="" alt="" id="lightboxImg">
+  <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- ==================== 交互脚本 ==================== -->
+<script>
+(function () {
+  /* ---------- 1. 分类筛选 ---------- */
+  var filterBtns = document.querySelectorAll('.filter-btn');
+  var cards      = document.querySelectorAll('.card');
+
+  filterBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+
+      var filter = btn.getAttribute('data-filter');
+      cards.forEach(function (card) {
+        var match = (filter === 'all' || card.getAttribute('data-cat') === filter);
+        card.style.display = match ? '' : 'none';
+      });
+    });
+  });
+
+  /* ---------- 2. 灯箱查看大图 ---------- */
+  var lightbox  = document.getElementById('lightbox');
+  var lbImg     = document.getElementById('lightboxImg');
+  var lbCaption = document.getElementById('lightboxCaption');
+
+  function openLightbox(card) {
+    var img   = card.querySelector('img');
+    var title = card.querySelector('h3').textContent;
+    var sub   = card.querySelector('p').textContent;
+
+    lbImg.src = img.src;
+    lbImg.alt = img.alt;
+    lbCaption.textContent = title + ' · ' + sub;
+
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  cards.forEach(function (card) {
+    card.addEventListener('click', function () { openLightbox(card); });
+  });
+
+  lightbox.addEventListener('click', function (e) {
+    if (e.target !== lbImg) closeLightbox();
+  });
+  document.getElementById('closeBtn').addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  /* ---------- 3. 卡片滚动淡入 ---------- */
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    cards.forEach(function (card, i) {
+      card.style.transitionDelay = (i % 4) * 70 + 'ms';
+      io.observe(card);
+    });
+  } else {
+    cards.forEach(function (card) { card.classList.add('in'); });
+  }
+})();
+</script>
+
+</body>
+</html>
